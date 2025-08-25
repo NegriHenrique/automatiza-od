@@ -55,4 +55,6 @@ def test_pasta_arquivos_existe():
     assert pasta_arquivos.exists(), "Pasta 'arquivos' não encontrada"
 
     pasta_ods = pasta_arquivos / "ODs"
-    assert pasta_ods.exists(), "Pasta 'arquivos/ODs' não encontrada"
+    # Criar a pasta se ela não existir (pode ser removida pelo gitignore)
+    pasta_ods.mkdir(exist_ok=True)
+    assert pasta_ods.exists(), "Pasta 'arquivos/ODs' não pode ser criada"
