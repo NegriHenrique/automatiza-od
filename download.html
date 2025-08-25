@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Download - Ordem do Dia</title>
+    <style>
+        :root {
+            --primary: #007bff;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --border: #dee2e6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: var(--dark);
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+
+        .subtitle {
+            color: #6c757d;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, var(--primary), var(--success));
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,123,255,0.3);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0,123,255,0.4);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+
+        .info-box {
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .info-box h3 {
+            color: var(--dark);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box ol {
+            margin-left: 20px;
+            color: #495057;
+        }
+
+        .info-box li {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        .status-indicator {
+            background: var(--success);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .quick-links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .quick-link {
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .quick-link:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .download-btn {
+                padding: 15px 30px;
+                font-size: 1.1rem;
+            }
+            
+            .quick-links {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">📋</div>
+        <h1>Ordem do Dia</h1>
+        <p class="subtitle">Sistema Profissional de Geração de ODs</p>
+        
+        <div class="status-indicator">
+            ✅ Sempre a Última Versão
+        </div>
+
+        <a href="https://github.com/NegriHenrique/automatizacao-od/actions/workflows/ci-cd.yml" 
+           class="download-btn" 
+           target="_blank"
+           onclick="trackDownload()">
+            🚀 BAIXAR EXECUTÁVEL
+        </a>
+
+        <div class="info-box">
+            <h3>💡 Como Baixar</h3>
+            <ol>
+                <li><strong>Clique no botão</strong> "BAIXAR EXECUTÁVEL" acima</li>
+                <li><strong>Escolha o último build</strong> com ✅ (mais recente no topo)</li>
+                <li><strong>Role até "Artifacts"</strong> na parte inferior da página</li>
+                <li><strong>Clique em "executavel-windows"</strong> para baixar</li>
+                <li><strong>Extraia o ZIP</strong> e execute GeradorOD.exe</li>
+            </ol>
+        </div>
+
+        <div class="info-box">
+            <h3>📦 O que você vai baixar</h3>
+            <ul style="list-style: none; margin-left: 0;">
+                <li>🎯 <strong>GeradorOD.exe</strong> - Aplicação principal</li>
+                <li>📋 <strong>Manual do usuário</strong> completo</li>
+                <li>📁 <strong>Arquivos de exemplo</strong> para teste</li>
+                <li>⚙️ <strong>Configurações</strong> pré-definidas</li>
+            </ul>
+        </div>
+
+        <div class="quick-links">
+            <a href="https://github.com/NegriHenrique/automatizacao-od" class="quick-link" target="_blank">
+                📚 Código Fonte
+            </a>
+            <a href="https://github.com/NegriHenrique/automatizacao-od/issues" class="quick-link" target="_blank">
+                🐛 Reportar Bug
+            </a>
+            <a href="https://github.com/NegriHenrique/automatizacao-od/releases" class="quick-link" target="_blank">
+                📋 Versões
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>🤖 Página atualizada automaticamente pelo CI/CD</p>
+            <p>📅 Sempre aponta para a versão mais recente</p>
+        </div>
+    </div>
+
+    <script>
+        function trackDownload() {
+            console.log('🚀 Download iniciado:', new Date().toISOString());
+            
+            // Opcional: Analytics ou tracking
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'download', {
+                    'event_category': 'software',
+                    'event_label': 'ordem-do-dia-executavel'
+                });
+            }
+        }
+
+        // Auto-refresh da página a cada 5 minutos para garantir links atualizados
+        setTimeout(() => {
+            location.reload();
+        }, 5 * 60 * 1000);
+
+        // Adicionar indicador visual de que é sempre a última versão
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.querySelector('.download-btn');
+            btn.setAttribute('title', 'Sempre a última versão compilada automaticamente');
+        });
+    </script>
+</body>
+</html>
