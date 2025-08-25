@@ -142,8 +142,8 @@ print_status "Verificando conflitos de merge..." "info"
 if git ls-files -u | grep -q .; then
     print_status "Conflitos de merge detectados!" "error"
     ERRORS=$((ERRORS + 1))
-elif grep -rE "^<<<<<<< |^>>>>>>> |^=======$" --include="*.py" --include="*.yml" --include="*.yaml" --include="*.json" . 2>/dev/null; then
-    print_status "Possíveis marcadores de conflito encontrados!" "error"
+elif grep -rE "^<<<<<<< |^>>>>>>> |^=======$" --include="*.py" --include="*.yml" --include="*.yaml" --include="*.json" --exclude-dir=".venv" --exclude-dir="htmlcov" --exclude-dir="__pycache__" . 2>/dev/null; then
+    print_status "Possíveis marcadores de conflito encontrados!" "error" 
     ERRORS=$((ERRORS + 1))
 else
     print_status "Nenhum conflito detectado" "success"
