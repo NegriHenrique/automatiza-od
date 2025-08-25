@@ -15,7 +15,7 @@ def limpar_build():
     for dir_name in dirs_para_remover:
         if os.path.exists(dir_name):
             shutil.rmtree(dir_name)
-            print(f"✅ Removido: {dir_name}")
+            print(f"OK Removido: {dir_name}")
 
 
 def criar_executavel():
@@ -40,7 +40,7 @@ def criar_executavel():
     ]
 
     PyInstaller.__main__.run(args)
-    print("✅ Executável gerado!")
+    print("OK Executável gerado!")
 
 
 def criar_estrutura_distribuicao():
@@ -58,7 +58,7 @@ def criar_estrutura_distribuicao():
     exe_source = Path("distribuicao/GeradorOD.exe")
     if exe_source.exists():
         shutil.copy2(exe_source, dist_path / "GeradorOD.exe")
-        print("✅ Executável copiado")
+        print("OK Executável copiado")
 
     # Criar pasta arquivos com estrutura necessária
     arquivos_dist = dist_path / "arquivos"
@@ -72,12 +72,12 @@ def criar_estrutura_distribuicao():
             dest = dist_path / arquivo
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(arquivo, dest)
-            print(f"✅ Copiado: {arquivo}")
+            print(f"OK Copiado: {arquivo}")
 
     # Criar pasta ODs vazia
     ods_path = arquivos_dist / "ODs"
     ods_path.mkdir()
-    print("✅ Pasta ODs criada")
+    print("OK Pasta ODs criada")
 
     # Criar arquivo README de distribuição
     readme_content = """# Sistema Gerador de OD - Executável v2.0
@@ -93,18 +93,18 @@ def criar_estrutura_distribuicao():
 1. Certifique-se de que os arquivos estão na pasta 'arquivos/':
    - DECUPAGEM.csv (planilha com as cenas)
    - PLANO_FINAL.pdf (cronograma de filmagem)
-2. Use o botão "📂 Abrir Pasta" na interface para acessar a pasta
-3. Use o botão "🔄 Verificar Arquivos" para confirmar que estão corretos
+2. Use o botão " Abrir Pasta" na interface para acessar a pasta
+3. Use o botão " Verificar Arquivos" para confirmar que estão corretos
 
 ### Interface Gráfica:
 - ⚠️ **Aviso laranja**: Lembrete sobre arquivos necessários
-- 📁 **Status dos Arquivos**: Mostra se os arquivos foram encontrados
+-  **Status dos Arquivos**: Mostra se os arquivos foram encontrados
 - 📅 **Seleção de Dias**: Escolha quais ODs gerar
   - "🎬 Todos os dias" (padrão) - Gera todas as ODs
   - Ou selecione dias específicos individualmente
-- 🚀 **Gerar ODs**: Inicia a geração
+-  **Gerar ODs**: Inicia a geração
 - 🗑️ **Limpar ODs**: Remove ODs existentes
-- 📊 **Progresso**: Mostra andamento e logs detalhados
+-  **Progresso**: Mostra andamento e logs detalhados
 
 ### MODO LINHA DE COMANDO (Avançado):
 Abra o terminal na pasta do executável e execute:
@@ -127,8 +127,8 @@ pasta_do_executavel/
 
 ## Recursos da Interface:
 - ✨ **Design Moderno**: Interface limpa e intuitiva
-- 🔄 **Verificação Automática**: Detecta arquivos automaticamente
-- 📊 **Progresso Visual**: Barra de progresso e logs em tempo real
+-  **Verificação Automática**: Detecta arquivos automaticamente
+-  **Progresso Visual**: Barra de progresso e logs em tempo real
 - 🎯 **Seleção Flexível**: Gere todos os dias ou apenas os selecionados
 - 🛡️ **Validação**: Confirma arquivos antes de gerar
 - 🔍 **Logs Detalhados**: Acompanhe cada etapa do processo
@@ -143,19 +143,19 @@ pasta_do_executavel/
 ## Solução de Problemas:
 
 ### Interface não abre:
-- ✅ Verificar se é Windows 64-bit
-- ✅ Executar como administrador se necessário
-- ✅ Verificar antivírus (pode estar bloqueando)
+- OK Verificar se é Windows 64-bit
+- OK Executar como administrador se necessário
+- OK Verificar antivírus (pode estar bloqueando)
 
 ### Erro: "Arquivo não encontrado":
-- ✅ Usar botão "📂 Abrir Pasta" para verificar localização
-- ✅ Verificar se `DECUPAGEM.csv` e `PLANO_FINAL.pdf` estão corretos
-- ✅ Usar botão "🔄 Verificar Arquivos" para confirmar
+- OK Usar botão " Abrir Pasta" para verificar localização
+- OK Verificar se `DECUPAGEM.csv` e `PLANO_FINAL.pdf` estão corretos
+- OK Usar botão " Verificar Arquivos" para confirmar
 
 ### Geração falha:
-- ✅ Verificar logs na área de "📊 Progresso"
-- ✅ Confirmar formato dos arquivos (CSV e PDF)
-- ✅ Verificar permissões da pasta
+- OK Verificar logs na área de " Progresso"
+- OK Confirmar formato dos arquivos (CSV e PDF)
+- OK Verificar permissões da pasta
 
 ## Suporte:
 - Use a área de logs da interface para diagnosticar problemas
@@ -171,7 +171,7 @@ Interface Gráfica Moderna | Developed with ❤️ for Audiovisual Production
     with open(dist_path / "README.txt", "w", encoding="utf-8") as f:
         f.write(readme_content)
 
-    print("✅ README criado")
+    print("OK README criado")
 
     # Criar script de exemplo para Windows
     bat_content = """@echo off
@@ -187,12 +187,12 @@ pause
     with open(dist_path / "exemplo_uso.bat", "w", encoding="utf-8") as f:
         f.write(bat_content)
 
-    print("✅ Script de exemplo criado")
+    print("OK Script de exemplo criado")
     print(f"📦 Distribuição completa criada em: {dist_path.absolute()}")
 
 
 def main():
-    print("🚀 Iniciando build do executável...")
+    print("Iniciando build do executavel...")
 
     # Limpar builds anteriores
     limpar_build()
@@ -203,9 +203,9 @@ def main():
     # Criar estrutura de distribuição
     criar_estrutura_distribuicao()
 
-    print("\n🎉 Build concluído com sucesso!")
-    print("📁 Pasta de distribuição: distribuicao_completa/")
-    print("💡 Para testar: cd distribuicao_completa && GeradorOD.exe all")
+    print("\nBuild concluido com sucesso!")
+    print("Pasta de distribuicao: distribuicao_completa/")
+    print("Para testar: cd distribuicao_completa && GeradorOD.exe all")
 
 
 if __name__ == "__main__":

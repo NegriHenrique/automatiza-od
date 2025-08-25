@@ -11,18 +11,18 @@
 1. Certifique-se de que os arquivos estão na pasta 'arquivos/':
    - DECUPAGEM.csv (planilha com as cenas)
    - PLANO_FINAL.pdf (cronograma de filmagem)
-2. Use o botão "📂 Abrir Pasta" na interface para acessar a pasta
-3. Use o botão "🔄 Verificar Arquivos" para confirmar que estão corretos
+2. Use o botão " Abrir Pasta" na interface para acessar a pasta
+3. Use o botão " Verificar Arquivos" para confirmar que estão corretos
 
 ### Interface Gráfica:
 - ⚠️ **Aviso laranja**: Lembrete sobre arquivos necessários
-- 📁 **Status dos Arquivos**: Mostra se os arquivos foram encontrados
+-  **Status dos Arquivos**: Mostra se os arquivos foram encontrados
 - 📅 **Seleção de Dias**: Escolha quais ODs gerar
   - "🎬 Todos os dias" (padrão) - Gera todas as ODs
   - Ou selecione dias específicos individualmente
-- 🚀 **Gerar ODs**: Inicia a geração
+-  **Gerar ODs**: Inicia a geração
 - 🗑️ **Limpar ODs**: Remove ODs existentes
-- 📊 **Progresso**: Mostra andamento e logs detalhados
+-  **Progresso**: Mostra andamento e logs detalhados
 
 ### MODO LINHA DE COMANDO (Avançado):
 Abra o terminal na pasta do executável e execute:
@@ -45,8 +45,8 @@ pasta_do_executavel/
 
 ## Recursos da Interface:
 - ✨ **Design Moderno**: Interface limpa e intuitiva
-- 🔄 **Verificação Automática**: Detecta arquivos automaticamente
-- 📊 **Progresso Visual**: Barra de progresso e logs em tempo real
+-  **Verificação Automática**: Detecta arquivos automaticamente
+-  **Progresso Visual**: Barra de progresso e logs em tempo real
 - 🎯 **Seleção Flexível**: Gere todos os dias ou apenas os selecionados
 - 🛡️ **Validação**: Confirma arquivos antes de gerar
 - 🔍 **Logs Detalhados**: Acompanhe cada etapa do processo
@@ -61,19 +61,19 @@ pasta_do_executavel/
 ## Solução de Problemas:
 
 ### Interface não abre:
-- ✅ Verificar se é Windows 64-bit
-- ✅ Executar como administrador se necessário
-- ✅ Verificar antivírus (pode estar bloqueando)
+- OK Verificar se é Windows 64-bit
+- OK Executar como administrador se necessário
+- OK Verificar antivírus (pode estar bloqueando)
 
 ### Erro: "Arquivo não encontrado":
-- ✅ Usar botão "📂 Abrir Pasta" para verificar localização
-- ✅ Verificar se `DECUPAGEM.csv` e `PLANO_FINAL.pdf` estão corretos
-- ✅ Usar botão "🔄 Verificar Arquivos" para confirmar
+- OK Usar botão " Abrir Pasta" para verificar localização
+- OK Verificar se `DECUPAGEM.csv` e `PLANO_FINAL.pdf` estão corretos
+- OK Usar botão " Verificar Arquivos" para confirmar
 
 ### Geração falha:
-- ✅ Verificar logs na área de "📊 Progresso"
-- ✅ Confirmar formato dos arquivos (CSV e PDF)
-- ✅ Verificar permissões da pasta
+- OK Verificar logs na área de " Progresso"
+- OK Confirmar formato dos arquivos (CSV e PDF)
+- OK Verificar permissões da pasta
 
 ## Suporte:
 - Use a área de logs da interface para diagnosticar problemas

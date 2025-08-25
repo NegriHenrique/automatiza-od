@@ -84,9 +84,9 @@ fi
 
 # 6. Testes rápidos
 print_status "Executando testes rápidos..." "info"
-if ! python -m pytest tests/test_simple.py -q > /dev/null 2>&1; then
+if ! python -m pytest test_simple.py -q > /dev/null 2>&1; then
     print_status "Testes rápidos falharam:" "error"
-    python -m pytest tests/test_simple.py -v
+    python -m pytest test_simple.py -v
     ERRORS=$((ERRORS + 1))
 else
     print_status "Testes rápidos OK" "success"
