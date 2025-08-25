@@ -1,0 +1,22 @@
+# Dependências principais do Ordem do Dia
+pandas>=1.5.0
+pdfplumber>=0.9.0
+openpyxl>=3.1.0
+
+# Dependências de desenvolvimento e teste
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.0.0
+flake8>=6.0.0
+
+# GUI (opcional - para interface gráfica)
+customtkinter>=5.2.0
+pillow>=10.0.0
+
+# Build e distribuição
+pyinstaller>=5.13.0
+
+# Segurança e qualidade
+bandit>=1.7.0
+safety>=2.3.0
+mypy>=1.5.0

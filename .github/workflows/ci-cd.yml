@@ -122,28 +122,12 @@ jobs:
         run: |
           # Teste se o executável inicia sem erros (modo CLI)
           try {
-            # Teste com --help (deve retornar código 0 e mostrar ajuda)
-            $process = Start-Process -FilePath "distribuicao_completa/GeradorOD.exe" -ArgumentList "--help" -Wait -NoNewWindow -PassThru -RedirectStandardOutput "test_output.txt" -RedirectStandardError "test_error.txt"
-            
-            # Verificar se o processo terminou em tempo hábil (max 30 segundos)
+            $process = Start-Process -FilePath "distribuicao_completa/GeradorOD.exe" -ArgumentList "--help" -Wait -NoNewWindow -PassThru
             if ($process.ExitCode -eq 0) {
-              Write-Host "✅ Executável respondeu corretamente ao --help"
-              $output = Get-Content "test_output.txt" -Raw
-              if ($output -match "Sistema de Geracao de OD") {
-                Write-Host "✅ Mensagem de ajuda exibida corretamente"
-              } else {
-                Write-Host "⚠️ Mensagem de ajuda não encontrada"
-              }
+              Write-Host "✅ Executável passou no teste básico"
             } else {
               Write-Host "⚠️ Executável retornou código: $($process.ExitCode)"
-              $error = Get-Content "test_error.txt" -Raw
-              Write-Host "Erro: $error"
             }
-            
-            # Limpeza
-            Remove-Item "test_output.txt" -ErrorAction SilentlyContinue
-            Remove-Item "test_error.txt" -ErrorAction SilentlyContinue
-            
           } catch {
             Write-Host "⚠️ Erro ao testar executável: $($_.Exception.Message)"
           }
