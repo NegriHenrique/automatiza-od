@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
-Script para gerar executável do Sistema de Geração de OD
+Script para gerar executavel do Sistema de Geracao de OD
 """
 
 import PyInstaller.__main__
@@ -10,7 +11,7 @@ from pathlib import Path
 
 
 def limpar_build():
-    """Remove diretórios de build anteriores"""
+    """Remove diretorios de build anteriores"""
     dirs_para_remover = ["build", "dist", "__pycache__"]
     for dir_name in dirs_para_remover:
         if os.path.exists(dir_name):
@@ -19,26 +20,26 @@ def limpar_build():
 
 
 def criar_executavel():
-    """Cria o executável com PyInstaller"""
-    print("🔨 Gerando executável...")
+    """Cria o executavel com PyInstaller"""
+    print("Gerando executavel...")
 
-    # Argumentos do PyInstaller com configurações de segurança
+    # Argumentos do PyInstaller com configuracoes de seguranca
     args = [
         "gerar_od.py",  # Arquivo principal
-        "--onefile",  # Gerar um único arquivo
-        "--name=GeradorOD",  # Nome do executável
-        "--icon=NONE",  # Sem ícone por enquanto
+        "--onefile",  # Gerar um unico arquivo
+        "--name=GeradorOD",  # Nome do executavel
+        "--icon=NONE",  # Sem icone por enquanto
         "--windowed",  # Sem console (GUI)
         "--clean",  # Limpar cache
-        "--noconfirm",  # Não pedir confirmação
+        "--noconfirm",  # Nao pedir confirmacao
         "--add-data=arquivos;arquivos",  # Incluir pasta arquivos
-        "--distpath=distribuicao",  # Pasta de saída
-        "--workpath=build_temp",  # Pasta temporária
+        "--distpath=distribuicao",  # Pasta de saida
+        "--workpath=build_temp",  # Pasta temporaria
         "--hidden-import=customtkinter",  # Incluir customtkinter
         "--hidden-import=PIL",  # Incluir Pillow
         "--hidden-import=PIL._tkinter_finder",  # Fix para tkinter
-        # Configurações de segurança para reduzir alertas do Windows
-        "--exclude-module=PyQt5",  # Excluir módulos desnecessários
+        # Configuracoes de seguranca para reduzir alertas do Windows
+        "--exclude-module=PyQt5",  # Excluir modulos desnecessarios
         "--exclude-module=PyQt6",
         "--exclude-module=tkinter.test",
         "--exclude-module=test",
@@ -96,12 +97,12 @@ VSVersionInfo(
 
     with open("version_info.txt", "w", encoding="utf-8") as f:
         f.write(version_content)
-    print("📋 Arquivo de versão criado")
+    print("Arquivo de versao criado")
 
 
 def criar_estrutura_distribuicao():
-    """Cria estrutura para distribuição"""
-    print(" Criando estrutura de distribuição...")
+    """Cria estrutura para distribuicao"""
+    print("Criando estrutura de distribuicao...")
 
     # Criar pasta principal
     dist_path = Path("distribuicao_completa")
@@ -110,11 +111,11 @@ def criar_estrutura_distribuicao():
 
     dist_path.mkdir()
 
-    # Copiar executável
+    # Copiar executavel
     exe_source = Path("distribuicao/GeradorOD.exe")
     if exe_source.exists():
         shutil.copy2(exe_source, dist_path / "GeradorOD.exe")
-        print("OK Executável copiado")
+        print("Executavel copiado")
 
     # Criar pasta arquivos com estrutura necessária
     arquivos_dist = dist_path / "arquivos"
@@ -136,38 +137,38 @@ def criar_estrutura_distribuicao():
     print("OK Pasta ODs criada")
 
     # Criar arquivo README de distribuição
-    readme_content = """# Sistema Gerador de OD - Executável v2.0
+    readme_content = """# Sistema Gerador de OD - Executavel v2.0
 
 ## Como usar:
 
-### MODO AUTOMÁTICO (Recomendado):
+### MODO AUTOMATICO (Recomendado):
 1. **Duplo clique** em `GeradorOD.exe`
-2. A interface gráfica será aberta automaticamente
-3. Siga as instruções na tela
+2. A interface grafica sera aberta automaticamente
+3. Siga as instrucoes na tela
 
-### Preparação dos Arquivos:
-1. Certifique-se de que os arquivos estão na pasta 'arquivos/':
+### Preparacao dos Arquivos:
+1. Certifique-se de que os arquivos estao na pasta 'arquivos/':
    - DECUPAGEM.csv (planilha com as cenas)
    - PLANO_FINAL.pdf (cronograma de filmagem)
-2. Use o botão " Abrir Pasta" na interface para acessar a pasta
-3. Use o botão " Verificar Arquivos" para confirmar que estão corretos
+2. Use o botao "Abrir Pasta" na interface para acessar a pasta
+3. Use o botao "Verificar Arquivos" para confirmar que estao corretos
 
-### Interface Gráfica:
-- ⚠️ **Aviso laranja**: Lembrete sobre arquivos necessários
--  **Status dos Arquivos**: Mostra se os arquivos foram encontrados
-- 📅 **Seleção de Dias**: Escolha quais ODs gerar
-  - "🎬 Todos os dias" (padrão) - Gera todas as ODs
-  - Ou selecione dias específicos individualmente
--  **Gerar ODs**: Inicia a geração
-- 🗑️ **Limpar ODs**: Remove ODs existentes
--  **Progresso**: Mostra andamento e logs detalhados
+### Interface Grafica:
+- **Aviso laranja**: Lembrete sobre arquivos necessarios
+- **Status dos Arquivos**: Mostra se os arquivos foram encontrados
+- **Selecao de Dias**: Escolha quais ODs gerar
+  - "Todos os dias" (padrao) - Gera todas as ODs
+  - Ou selecione dias especificos individualmente
+- **Gerar ODs**: Inicia a geracao
+- **Limpar ODs**: Remove ODs existentes
+- **Progresso**: Mostra andamento e logs detalhados
 
-### MODO LINHA DE COMANDO (Avançado):
-Abra o terminal na pasta do executável e execute:
+### MODO LINHA DE COMANDO (Avancado):
+Abra o terminal na pasta do executavel e execute:
 - `GeradorOD.exe 1` - Gera apenas a OD do dia 1
 - `GeradorOD.exe all` - Gera todas as ODs
 
-## Estrutura de pastas necessária:
+## Estrutura de pastas necessaria:
 ```
 pasta_do_executavel/
 ├── GeradorOD.exe
@@ -182,52 +183,52 @@ pasta_do_executavel/
 ```
 
 ## Recursos da Interface:
-- ✨ **Design Moderno**: Interface limpa e intuitiva
--  **Verificação Automática**: Detecta arquivos automaticamente
--  **Progresso Visual**: Barra de progresso e logs em tempo real
-- 🎯 **Seleção Flexível**: Gere todos os dias ou apenas os selecionados
-- 🛡️ **Validação**: Confirma arquivos antes de gerar
-- 🔍 **Logs Detalhados**: Acompanhe cada etapa do processo
+- **Design Moderno**: Interface limpa e intuitiva
+- **Verificacao Automatica**: Detecta arquivos automaticamente
+- **Progresso Visual**: Barra de progresso e logs em tempo real
+- **Selecao Flexivel**: Gere todos os dias ou apenas os selecionados
+- **Validacao**: Confirma arquivos antes de gerar
+- **Logs Detalhados**: Acompanhe cada etapa do processo
 
 ## Facilidades de UX/UI:
-- **Avisos Visuais**: Cores e ícones indicam status
-- **Botões Intuitivos**: Ações claras com emojis descritivos
-- **Feedback Imediato**: Confirmações e alertas apropriados
-- **Organização Clara**: Seções bem definidas e hierarquia visual
-- **Acessibilidade**: Botões grandes e textos legíveis
+- **Avisos Visuais**: Cores e icones indicam status
+- **Botoes Intuitivos**: Acoes claras com icones descritivos
+- **Feedback Imediato**: Confirmacoes e alertas apropriados
+- **Organizacao Clara**: Secoes bem definidas e hierarquia visual
+- **Acessibilidade**: Botoes grandes e textos legiveis
 
-## Solução de Problemas:
+## Solucao de Problemas:
 
-### Interface não abre:
-- OK Verificar se é Windows 64-bit
-- OK Executar como administrador se necessário
-- OK Verificar antivírus (pode estar bloqueando)
+### Interface nao abre:
+- Verificar se e Windows 64-bit
+- Executar como administrador se necessario
+- Verificar antivirus (pode estar bloqueando)
 
-### Erro: "Arquivo não encontrado":
-- OK Usar botão " Abrir Pasta" para verificar localização
-- OK Verificar se `DECUPAGEM.csv` e `PLANO_FINAL.pdf` estão corretos
-- OK Usar botão " Verificar Arquivos" para confirmar
+### Erro: "Arquivo nao encontrado":
+- Usar botao "Abrir Pasta" para verificar localizacao
+- Verificar se `DECUPAGEM.csv` e `PLANO_FINAL.pdf` estao corretos
+- Usar botao "Verificar Arquivos" para confirmar
 
-### Geração falha:
-- OK Verificar logs na área de " Progresso"
-- OK Confirmar formato dos arquivos (CSV e PDF)
-- OK Verificar permissões da pasta
+### Geracao falha:
+- Verificar logs na area de "Progresso"
+- Confirmar formato dos arquivos (CSV e PDF)
+- Verificar permissoes da pasta
 
 ## Suporte:
-- Use a área de logs da interface para diagnosticar problemas
-- Verifique se todos os arquivos estão no formato correto
-- Para problemas específicos, contate o desenvolvedor
+- Use a area de logs da interface para diagnosticar problemas
+- Verifique se todos os arquivos estao no formato correto
+- Para problemas especificos, contate o desenvolvedor
 
 ---
 
 **Sistema Gerador de OD v2.0**
-Interface Gráfica Moderna | Developed with ❤️ for Audiovisual Production
+Interface Grafica Moderna | Developed for Audiovisual Production
 """
 
     with open(dist_path / "README.txt", "w", encoding="utf-8") as f:
         f.write(readme_content)
 
-    print("OK README criado")
+    print("README criado")
 
     # Criar script de exemplo para Windows
     bat_content = """@echo off
@@ -243,8 +244,8 @@ pause
     with open(dist_path / "exemplo_uso.bat", "w", encoding="utf-8") as f:
         f.write(bat_content)
 
-    print("OK Script de exemplo criado")
-    print(f" Distribuição completa criada em: {dist_path.absolute()}")
+    print("Script de exemplo criado")
+    print(f"Distribuicao completa criada em: {dist_path.absolute()}")
 
 
 def main():
@@ -253,10 +254,10 @@ def main():
     # Limpar builds anteriores
     limpar_build()
 
-    # Criar executável
+    # Criar executavel
     criar_executavel()
 
-    # Criar estrutura de distribuição
+    # Criar estrutura de distribuicao
     criar_estrutura_distribuicao()
 
     print("\nBuild concluido com sucesso!")

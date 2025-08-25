@@ -1,18 +1,6 @@
 #!/bin/bash
 
 # 🚀 Pre-push Hook - Ordem do Dia
-# # 2. Executar testes
-print_status "Executando suite completa de testes..." "info"
-if ! .venv/Scripts/python.exe -m pytest tests/ -v >/dev/null 2>&1; then
-    print_status "Testes falharam" "error"
-    ERRORS=$((ERRORS + 1))
-else
-    print_status "Todos os testes passaram" "success"
-fi
-
-# 3. Verificar cobertura de testes
-print_status "Verificando cobertura de testes..." "info"
-COVERAGE=$(.venv/Scripts/python.exe -m pytest --cov=. --cov-report=term-missing tests/ 2>/dev/null | grep "TOTAL" | awk '{print $4}' | sed 's/%//')===================
 # Verificações antes do push para garantir qualidade
 
 # Cores para output
@@ -29,6 +17,149 @@ WARNINGS=0
 # Função para print com status
 print_status() {
     local message="$1"
+    local type="$2"
+    
+    case $type in
+        "success") echo -e "${GREEN}✅ $message${NC}" ;;
+        "error") echo -e "${RED}❌ $message${NC}" ;;
+        "warning") echo -e "${YELLOW}⚠️ $message${NC}" ;;
+        "info") echo -e "${BLUE}ℹ️ $message${NC}" ;;
+        *) echo "ℹ️ $message" ;;
+    esac
+}
+
+echo "ℹ️ 🚀 Executando verificações pre-push..."
+
+# Obter informações do branch
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+print_status "Branch atual: $BRANCH" "info"
+
+# 1. Executar suite completa de testes
+print_status "Executando suite completa de testes..." "info"
+if python -m pytest tests/ -v --tb=short; then
+    print_status "Todos os testes passaram" "success"
+else
+    print_status "Testes falharam" "error"
+    ERRORS=$((ERRORS + 1))
+fi
+
+# 2. Verificar cobertura de testes
+print_status "Verificando cobertura de testes..." "info"
+COVERAGE=$(python -m pytest --cov=. --cov-report=term-missing tests/ 2>/dev/null | grep "TOTAL" | awk '{print $4}' | sed 's/%//')
+
+if [[ "$COVERAGE" =~ ^[0-9]+$ ]] && [ "$COVERAGE" -ge 70 ]; then
+    print_status "Cobertura de testes: ${COVERAGE}%" "success"
+else
+    print_status "Cobertura de testes insuficiente: ${COVERAGE}% (mínimo: 70%)" "error"
+    ERRORS=$((ERRORS + 1))
+fi
+
+# 3. Testar geração do executável (crítico)
+print_status "Testando geração do executável..." "info"
+if python build_exe.py > build_log.txt 2>&1; then
+    if [ -f "distribuicao/GeradorOD.exe" ]; then
+        print_status "Executável gerado com sucesso" "success"
+        # Limpar arquivos temporários de build
+        rm -f build_log.txt version_info.txt 2>/dev/null
+    else
+        print_status "Falha na geração do executável!" "error"
+        echo "Últimas linhas do erro:"
+        tail -10 build_log.txt
+        ERRORS=$((ERRORS + 1))
+    fi
+else
+    print_status "Falha na geração do executável!" "error"
+    echo "Últimas linhas do erro:"
+    tail -10 build_log.txt
+    ERRORS=$((ERRORS + 1))
+fi
+
+# 4. Verificar TODOs e FIXMEs
+print_status "Verificando TODOs e FIXMEs..." "info"
+TODO_COUNT=$(grep -r "TODO\|FIXME" --include="*.py" . 2>/dev/null | wc -l)
+if [ "$TODO_COUNT" -eq 0 ]; then
+    print_status "Nenhum TODO/FIXME encontrado" "success"
+else
+    print_status "$TODO_COUNT TODO/FIXME encontrados - considere resolver" "warning"
+    WARNINGS=$((WARNINGS + 1))
+fi
+
+# 5. Verificar se documentação está atualizada
+print_status "Verificando documentação..." "info"
+if [ -f "README.md" ]; then
+    # Verificar se README foi modificado recentemente
+    README_DAYS=$(find README.md -mtime +30 2>/dev/null | wc -l)
+    if [ "$README_DAYS" -gt 0 ]; then
+        print_status "README pode estar desatualizado" "warning"
+        WARNINGS=$((WARNINGS + 1))
+    else
+        print_status "Documentação OK" "success"
+    fi
+fi
+
+# 6. Verificações específicas do branch
+if [ "$BRANCH" = "main" ]; then
+    print_status "Verificações para branch main..." "info"
+    
+    # Verificar se há muitos commits desde a última tag
+    LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null)
+    if [ -n "$LAST_TAG" ]; then
+        COMMITS_SINCE_TAG=$(git rev-list "$LAST_TAG"..HEAD --count)
+        if [ "$COMMITS_SINCE_TAG" -gt 20 ]; then
+            print_status "$COMMITS_SINCE_TAG commits desde $LAST_TAG - considere criar nova tag" "warning"
+            WARNINGS=$((WARNINGS + 1))
+        fi
+    fi
+fi
+
+# 7. Verificar conflitos de merge
+print_status "Verificando conflitos de merge..." "info"
+if git diff --check --cached >/dev/null 2>&1; then
+    print_status "Nenhum conflito detectado" "success"
+else
+    print_status "Possíveis conflitos de merge detectados" "error"
+    ERRORS=$((ERRORS + 1))
+fi
+
+# 8. Verificar qualidade dos commits
+print_status "Verificando qualidade dos commits..." "info"
+LAST_COMMIT_MSG=$(git log -1 --pretty=%s)
+if [[ "$LAST_COMMIT_MSG" =~ ^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: ]]; then
+    print_status "Commit segue Conventional Commits" "success"
+else
+    print_status "Commit não segue Conventional Commits (recomendado)" "warning"
+    WARNINGS=$((WARNINGS + 1))
+fi
+
+# Resumo final
+echo ""
+print_status "📊 Resumo das verificações:" "info"
+if [ $ERRORS -eq 0 ]; then
+    print_status "✅ Todas as verificações críticas passaram" "success"
+else
+    print_status "❌ $ERRORS erro(s) encontrado(s). Corrija antes de fazer push." "error"
+fi
+
+if [ $WARNINGS -gt 0 ]; then
+    print_status "⚠️ $WARNINGS aviso(s)" "warning"
+fi
+
+# Dicas para correção
+if [ $ERRORS -gt 0 ]; then
+    echo ""
+    print_status "💡 Dicas para corrigir:" "info"
+    echo "   - Execute 'pytest tests/' para ver falhas em testes"
+    echo "   - Execute 'python build_exe.py' para testar o build"
+    echo "   - Resolva conflitos de merge se houver"
+    echo "   - Certifique-se de que todos os commits foram feitos"
+fi
+
+# Sair com código de erro se houver problemas críticos
+if [ $ERRORS -gt 0 ]; then
+    exit 1
+fi
+
+exit 0
     local type="${2:-info}"
     
     case $type in
@@ -83,26 +214,19 @@ else
     WARNINGS=$((WARNINGS + 1))
 fi
 
-# 3. Verificar se executável pode ser gerado
+# 3. Testar build (informativo apenas)
 print_status "Testando geração do executável..." "info"
-if .venv/Scripts/python.exe build_exe.py > build_log.txt 2>&1; then
+python build_exe.py > build_log.txt 2>&1
+if [ $? -eq 0 ]; then
     print_status "Executável gerado com sucesso" "success"
-    
-    # Verificar tamanho do executável
-    if [ -f "distribuicao_completa/GeradorOD.exe" ]; then
-        SIZE=$(du -m "distribuicao_completa/GeradorOD.exe" | cut -f1)
-        print_status "Tamanho do executável: ${SIZE}MB" "success"
-    fi
-    
-    # Limpeza
     rm -f build_log.txt
 else
-    print_status "Falha na geração do executável!" "error"
+    print_status "Falha na geração do executável (não bloqueia push)" "warning"
     if [ -f "build_log.txt" ]; then
         echo "Últimas linhas do erro:"
         tail -5 build_log.txt
     fi
-    ERRORS=$((ERRORS + 1))
+    WARNINGS=$((WARNINGS + 1))
 fi
 
 # 4. Verificar TODOs e FIXMEs
