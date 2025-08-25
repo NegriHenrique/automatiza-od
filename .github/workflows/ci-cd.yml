@@ -161,23 +161,40 @@ jobs:
 
       - name: 🧪 Teste básico do executável
         run: |
-          # Teste se o executável inicia sem erros (modo CLI)
-          try {
-            $process = Start-Process -FilePath "distribuicao_completa/GeradorOD.exe" -ArgumentList "--help" -Wait -NoNewWindow -PassThru
-            if ($process.ExitCode -eq 0) {
-              Write-Host "✅ Executável passou no teste básico"
+          # Teste se o executável inicia sem erros (modo CLI) com timeout
+          $exePath = "distribuicao_completa/GeradorOD.exe"
+          if (Test-Path $exePath) {
+            $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+            $startInfo.FileName = $exePath
+            $startInfo.Arguments = "--help"
+            $startInfo.UseShellExecute = $false
+            $startInfo.RedirectStandardOutput = $true
+            $startInfo.RedirectStandardError = $true
+            $process = New-Object System.Diagnostics.Process
+            $process.StartInfo = $startInfo
+            $process.Start() | Out-Null
+            # Timeout de 15 segundos
+            if ($process.WaitForExit(15000)) {
+              if ($process.ExitCode -eq 0) {
+                Write-Host "✅ Executável passou no teste básico"
+              } else {
+                Write-Host "⚠️ Executável retornou código: $($process.ExitCode)"
+              }
             } else {
-              Write-Host "⚠️ Executável retornou código: $($process.ExitCode)"
+              Write-Host "❌ Timeout: Executável não respondeu em 15 segundos"
+              $process.Kill()
+              exit 1
             }
-          } catch {
-            Write-Host "⚠️ Erro ao testar executável: $($_.Exception.Message)"
+          } else {
+            Write-Error "❌ Executável não encontrado para teste!"
+            exit 1
           }
 
       - name: 📦 Criar pacote de distribuição
         run: |
           # Executar script de assinatura (sem certificado, apenas validação)
           Write-Host "🔐 Executando validação de segurança do executável..."
-          powershell -ExecutionPolicy Bypass -File "sign_executable.ps1" -ExecutablePath "distribuicao_completa/GeradorOD.exe"
+          pwsh -ExecutionPolicy Bypass -File "sign_executable.ps1" -ExecutablePath "distribuicao_completa/GeradorOD.exe"
 
           # Criar ZIP com distribuição completa
           $version = "v2.0-$(Get-Date -Format 'yyyyMMdd')-$($env:GITHUB_SHA.Substring(0,7))"
