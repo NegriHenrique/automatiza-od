@@ -1,3 +1,0 @@
-[bandit]
-exclude_dirs = tests,build_temp,htmlcov,distribuicao,distribuicao_completa
-skips = B101,B601,B603,B607
