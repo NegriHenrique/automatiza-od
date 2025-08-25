@@ -59,7 +59,7 @@ jobs:
 
       - name: 🧪 Executar testes unitários
         run: |
-          pytest test_simple.py tests/ -v --cov=. --cov-report=html --cov-report=xml --cov-fail-under=10
+          pytest tests/ -v --cov=. --cov-report=html --cov-report=xml --cov-fail-under=10
 
       - name: 📊 Upload coverage para Codecov
         uses: codecov/codecov-action@v3

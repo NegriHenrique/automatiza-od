@@ -84,9 +84,9 @@ fi
 
 # 6. Testes rápidos
 print_status "Executando testes rápidos..." "info"
-if ! python -m pytest test_simple.py -q > /dev/null 2>&1; then
+if ! python -m pytest tests/test_simple.py -q > /dev/null 2>&1; then
     print_status "Testes rápidos falharam:" "error"
-    python -m pytest test_simple.py -v
+    python -m pytest tests/test_simple.py -v
     ERRORS=$((ERRORS + 1))
 else
     print_status "Testes rápidos OK" "success"
@@ -152,7 +152,7 @@ else
     echo "🔧 Dicas para corrigir:"
     echo "   - Execute 'black .' para formatar código"
     echo "   - Execute 'flake8 .' para ver erros de linting"
-    echo "   - Execute 'pytest test_simple.py' para testes básicos"
+    echo "   - Execute 'pytest tests/test_simple.py' para testes básicos"
     echo "   - Execute 'pytest --cov=. --cov-report=term-missing' para cobertura"
     echo "   - Execute 'pytest tests/' para testes completos"
     echo ""
