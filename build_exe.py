@@ -56,7 +56,7 @@ def criar_executavel():
     create_version_file()
 
     PyInstaller.__main__.run(args)
-    print("✅ Executável gerado!")
+    print("Executavel gerado!")
 
 
 def create_version_file():
