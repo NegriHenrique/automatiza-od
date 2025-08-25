@@ -82,8 +82,15 @@ if python build_exe.py > build_log.txt 2>&1; then
         SIZE=$(du -m "distribuicao_completa/GeradorOD.exe" | cut -f1)
         print_status "Tamanho do executável: ${SIZE}MB" "success"
     fi
+    
+    # Limpeza
+    rm -f build_log.txt
 else
     print_status "Falha na geração do executável!" "error"
+    if [ -f "build_log.txt" ]; then
+        echo "Últimas linhas do erro:"
+        tail -5 build_log.txt
+    fi
     ERRORS=$((ERRORS + 1))
 fi
 
