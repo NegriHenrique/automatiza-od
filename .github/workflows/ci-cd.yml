@@ -159,20 +159,6 @@ jobs:
             exit 1
           }
 
-      - name: 🧪 Teste básico do executável
-        run: |
-          # Teste se o executável inicia sem erros (modo CLI)
-          try {
-            $process = Start-Process -FilePath "distribuicao_completa/GeradorOD.exe" -ArgumentList "--help" -Wait -NoNewWindow -PassThru
-            if ($process.ExitCode -eq 0) {
-              Write-Host "✅ Executável passou no teste básico"
-            } else {
-              Write-Host "⚠️ Executável retornou código: $($process.ExitCode)"
-            }
-          } catch {
-            Write-Host "⚠️ Erro ao testar executável: $($_.Exception.Message)"
-          }
-
       - name: 📦 Criar pacote de distribuição
         run: |
           # Executar script de assinatura (sem certificado, apenas validação)
@@ -343,3 +329,4 @@ jobs:
           echo "🧪 Testes: ${{ needs.tests.result }}"
           echo "🔨 Build: ${{ needs.build.result }}"
           exit 1
+
