@@ -118,29 +118,20 @@ if [ "$BRANCH" = "main" ]; then
     fi
 fi
 
-# 9. Verificação de executável (se em main)
-if [ "$BRANCH" = "main" ]; then
-    print_status "Verificando se build do executável funciona..." "info"
-    if python build_exe.py > /dev/null 2>&1; then
-        print_status "Build do executável OK" "success"
-        # Limpar arquivos temporários do build
-        rm -rf build_temp distribuicao 2>/dev/null
-    else
-        print_status "Build do executável falhou (não-bloqueante)" "warning"
-    fi
-fi
+# 9. Verificação final
+# Build do executável é verificado apenas no pre-push para evitar loops
 
 # Resultado final
 echo ""
 if [ $ERRORS -eq 0 ]; then
-    print_status "🎉 Todas as verificações passaram! Commit autorizado." "success"
+    print_status "Todas as verificações passaram! Commit autorizado." "success"
     exit 0
 else
-    print_status "⛔ $ERRORS erro(s) encontrado(s). Corrija antes de commitar." "error"
+    print_status "$ERRORS erro(s) encontrado(s). Corrija antes de commitar." "error"
     echo ""
-    echo "💡 Dicas:"
+    echo "Dicas:"
     echo "   - Execute 'black .' para formatar código"
     echo "   - Execute 'flake8 .' para ver erros de linting" 
-    echo "   - Execute 'pytest tests/' para executar todos os testes"
+    echo "   - Execute 'pytest test_simple.py' para executar testes básicos"
     exit 1
 fi

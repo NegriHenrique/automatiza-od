@@ -134,28 +134,13 @@ dmypy.json
 # Build artifacts específicos do projeto
 GeradorOD_Distribuicao.zip
 GeradorOD.spec
+*.exe
 
-# Logs e arquivos temporários
-*.log
-*.tmp
-*.temp
-build_log.txt
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# Arquivos específicos do projeto que não devem ser versionados
+# Diretórios de build e distribuição
 /distribuicao_completa/
 /distribuicao/
 /build_temp/
+/build/
 
 # Arquivos de teste temporários
 test_output/
