@@ -2,9 +2,17 @@
 # Pre-push hook para Ordem do Dia
 # Este script executa antes de cada push para garantir qualidade do código
 
-echo "🚀 Executando verificações pre-push..."
-
-# Cores para output
+echo "🚀 Executando verificações pre-push..."# 7. Verificar se há conflitos de merge pendentes
+print_status "Verificando conflitos de merge..." "info"
+if git ls-files -u | grep -q .; then
+    print_status "Conflitos de merge detectados!" "error"
+    ERRORS=$((ERRORS + 1))
+elif grep -rE "^<<<<<<< |^>>>>>>> |^=======$" --include="*.py" --include="*.yml" --include="*.yaml" --include="*.json" . 2>/dev/null; then
+    print_status "Possíveis marcadores de conflito encontrados!" "error"
+    ERRORS=$((ERRORS + 1))
+else
+    print_status "Nenhum conflito detectado" "success"
+fis para output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
