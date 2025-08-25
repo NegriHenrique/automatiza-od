@@ -55,7 +55,8 @@ def buscar_ultimo_build():
     params = {"status": "completed", "conclusion": "success", "per_page": 1}
 
     try:
-        response = requests.get(url, params=params)
+        # Timeout configurado para evitar problemas de segurança (B113)
+        response = requests.get(url, params=params, timeout=30)
         response.raise_for_status()
         data = response.json()
 

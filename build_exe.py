@@ -20,9 +20,9 @@ def limpar_build():
 
 def criar_executavel():
     """Cria o executável com PyInstaller"""
-    print("Gerando executavel...")
+    print("🔨 Gerando executável...")
 
-    # Argumentos do PyInstaller
+    # Argumentos do PyInstaller com configurações de segurança
     args = [
         "gerar_od.py",  # Arquivo principal
         "--onefile",  # Gerar um único arquivo
@@ -37,10 +37,66 @@ def criar_executavel():
         "--hidden-import=customtkinter",  # Incluir customtkinter
         "--hidden-import=PIL",  # Incluir Pillow
         "--hidden-import=PIL._tkinter_finder",  # Fix para tkinter
+        # Configurações de segurança para reduzir alertas do Windows
+        "--exclude-module=PyQt5",  # Excluir módulos desnecessários
+        "--exclude-module=PyQt6",
+        "--exclude-module=tkinter.test",
+        "--exclude-module=test",
+        "--exclude-module=unittest",
+        "--exclude-module=doctest",
+        # Otimizações
+        "--strip",  # Remover símbolos de debug
+        "--optimize=2",  # Otimização máxima
+        # Informações de versão (ajuda com alertas de segurança)
+        "--version-file=version_info.txt",  # Arquivo de versão (se existir)
     ]
 
+    # Adicionar arquivo de versão se não existir
+    create_version_file()
+
     PyInstaller.__main__.run(args)
-    print("OK Executável gerado!")
+    print("✅ Executável gerado!")
+
+
+def create_version_file():
+    """Cria arquivo de informações de versão para o executável"""
+    version_content = """# UTF-8
+#
+# Para mais detalhes sobre estrutura de versão, veja:
+# https://docs.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource
+
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    filevers=(2, 0, 0, 0),
+    prodvers=(2, 0, 0, 0),
+    mask=0x3f,
+    flags=0x0,
+    OS=0x40004,
+    fileType=0x1,
+    subtype=0x0,
+    date=(0, 0)
+  ),
+  kids=[
+    StringFileInfo(
+      [
+      StringTable(
+        u'040904B0',
+        [StringStruct(u'CompanyName', u'Ordem do Dia - Produção Audiovisual'),
+        StringStruct(u'FileDescription', u'Sistema Gerador de Ordem do Dia'),
+        StringStruct(u'FileVersion', u'2.0.0.0'),
+        StringStruct(u'InternalName', u'GeradorOD'),
+        StringStruct(u'LegalCopyright', u'Copyright © 2025 - Sistema Ordem do Dia'),
+        StringStruct(u'OriginalFilename', u'GeradorOD.exe'),
+        StringStruct(u'ProductName', u'Gerador de Ordem do Dia'),
+        StringStruct(u'ProductVersion', u'2.0.0.0')])
+      ]), 
+    VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
+  ]
+)"""
+
+    with open("version_info.txt", "w", encoding="utf-8") as f:
+        f.write(version_content)
+    print("📋 Arquivo de versão criado")
 
 
 def criar_estrutura_distribuicao():
