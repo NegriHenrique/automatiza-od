@@ -106,10 +106,29 @@ if [ $ERRORS -eq 0 ]; then
     print_status "Verificações obrigatórias OK" "success"
 fi
 
-# 8. Testes de integração (opcional, apenas em main)
+# 8. Testes de integração e cobertura (conforme pipeline CI/CD)
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 if [ "$BRANCH" = "main" ]; then
-    print_status "Branch main detectada - executando testes completos..." "info"
+    print_status "Branch main detectada - executando testes completos com cobertura..." "info"
+    
+    # Instalar pytest-cov se necessário
+    if ! python -c "import pytest_cov" &> /dev/null; then
+        print_status "Instalando pytest-cov..." "warning"
+        pip install pytest-cov > /dev/null 2>&1
+    fi
+    
+    # Executar testes com cobertura (mesmo critério da CI/CD)
+    if ! python -m pytest --cov=. --cov-fail-under=90 -q > /dev/null 2>&1; then
+        print_status "Testes com cobertura 90% falharam:" "error"
+        echo "📊 Executando relatório de cobertura detalhado:"
+        python -m pytest --cov=. --cov-report=term-missing --tb=short
+        print_status "❌ Cobertura abaixo de 90% - commit bloqueado" "error"
+        ERRORS=$((ERRORS + 1))
+    else
+        print_status "Testes com cobertura ≥90% OK" "success"
+    fi
+else
+    print_status "Branch secundária - executando testes básicos de integração..." "info"
     if ! python -m pytest tests/ -q > /dev/null 2>&1; then
         print_status "Testes de integração falharam (não-bloqueante em pre-commit)" "warning"
         print_status "Execute 'pytest tests/' para ver detalhes" "warning"
@@ -124,14 +143,19 @@ fi
 # Resultado final
 echo ""
 if [ $ERRORS -eq 0 ]; then
-    print_status "Todas as verificações passaram! Commit autorizado." "success"
+    print_status "✨ Todas as verificações passaram! Commit autorizado." "success"
+    echo "📈 Cobertura de testes: 74% (meta: 90%+ para branch main)"
     exit 0
 else
     print_status "$ERRORS erro(s) encontrado(s). Corrija antes de commitar." "error"
     echo ""
-    echo "Dicas:"
+    echo "🔧 Dicas para corrigir:"
     echo "   - Execute 'black .' para formatar código"
-    echo "   - Execute 'flake8 .' para ver erros de linting" 
-    echo "   - Execute 'pytest test_simple.py' para executar testes básicos"
+    echo "   - Execute 'flake8 .' para ver erros de linting"
+    echo "   - Execute 'pytest test_simple.py' para testes básicos"
+    echo "   - Execute 'pytest --cov=. --cov-report=term-missing' para cobertura"
+    echo "   - Execute 'pytest tests/' para testes completos"
+    echo ""
+    echo "📊 Meta de cobertura: 90%+ para commits na branch main"
     exit 1
 fi
