@@ -145,3 +145,14 @@ GeradorOD.spec
 # Arquivos de teste temporários
 test_output/
 temp_files/
+
+# Arquivos de output gerados automaticamente pelo sistema
+/arquivos/ODs/
+arquivos/ODs/*.xlsx
+
+# Arquivos de cache do pytest e cobertura
+tests/__pycache__/
+tests/**/__pycache__/
+tests/**/*.pyc
+.coverage.*
+htmlcov/
