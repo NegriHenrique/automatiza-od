@@ -20,7 +20,7 @@ def limpar_build():
 
 def criar_executavel():
     """Cria o executável com PyInstaller"""
-    print("🔨 Gerando executável...")
+    print("Gerando executavel...")
 
     # Argumentos do PyInstaller
     args = [
@@ -45,7 +45,7 @@ def criar_executavel():
 
 def criar_estrutura_distribuicao():
     """Cria estrutura para distribuição"""
-    print("📦 Criando estrutura de distribuição...")
+    print(" Criando estrutura de distribuição...")
 
     # Criar pasta principal
     dist_path = Path("distribuicao_completa")
@@ -188,7 +188,7 @@ pause
         f.write(bat_content)
 
     print("OK Script de exemplo criado")
-    print(f"📦 Distribuição completa criada em: {dist_path.absolute()}")
+    print(f" Distribuição completa criada em: {dist_path.absolute()}")
 
 
 def main():
