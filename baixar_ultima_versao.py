@@ -42,7 +42,7 @@ except ImportError:
 
 # Configurações
 REPO_OWNER = "NegriHenrique"
-REPO_NAME = "automatizacao-od"
+REPO_NAME = "automatiza-od"
 WORKFLOW_NAME = "ci-cd.yml"
 ARTIFACT_NAME = "executavel-windows"
 

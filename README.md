@@ -1,13 +1,13 @@
 # 📋 Ordem do Dia - Sistema de Geração Automática
 
-[![Build Status](https://github.com/NegriHenrique/automatizacao-od/workflows/CI%2FCD/badge.svg)](https://github.com/NegriHenrique/automatizacao-od/actions)
+[![Build Status](https://github.com/NegriHenrique/automatiza-od/workflows/CI%2FCD/badge.svg)](https://github.com/NegriHenrique/automatiza-od/actions)
 [![Coverage](https://img.shields.io/badge/coverage-75%25-yellow.svg)](htmlcov/index.html)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ## 🚀 **DOWNLOAD RÁPIDO** 
 
-### 📦 **[⬇️ BAIXAR EXECUTÁVEL (ÚLTIMA VERSÃO)](https://github.com/NegriHenrique/automatizacao-od/actions/workflows/ci-cd.yml)**
+### 📦 **[⬇️ BAIXAR EXECUTÁVEL (ÚLTIMA VERSÃO)](https://github.com/NegriHenrique/automatiza-od/actions/workflows/ci-cd.yml)**
 
 > 🔧 **Como baixar**: Clique no link acima → Abra o último build verde → Role até "Artifacts" → Baixe "executavel-windows"
 
