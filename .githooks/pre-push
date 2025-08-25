@@ -1,7 +1,18 @@
 #!/bin/bash
 
 # 🚀 Pre-push Hook - Ordem do Dia
-# ===============================
+# # 2. Executar testes
+print_status "Executando suite completa de testes..." "info"
+if ! .venv/Scripts/python.exe -m pytest tests/ -v >/dev/null 2>&1; then
+    print_status "Testes falharam" "error"
+    ERRORS=$((ERRORS + 1))
+else
+    print_status "Todos os testes passaram" "success"
+fi
+
+# 3. Verificar cobertura de testes
+print_status "Verificando cobertura de testes..." "info"
+COVERAGE=$(.venv/Scripts/python.exe -m pytest --cov=. --cov-report=term-missing tests/ 2>/dev/null | grep "TOTAL" | awk '{print $4}' | sed 's/%//')===================
 # Verificações antes do push para garantir qualidade
 
 # Cores para output
@@ -74,7 +85,7 @@ fi
 
 # 3. Verificar se executável pode ser gerado
 print_status "Testando geração do executável..." "info"
-if python build_exe.py > build_log.txt 2>&1; then
+if .venv/Scripts/python.exe build_exe.py > build_log.txt 2>&1; then
     print_status "Executável gerado com sucesso" "success"
     
     # Verificar tamanho do executável
