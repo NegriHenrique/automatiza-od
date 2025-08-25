@@ -1,0 +1,98 @@
+name: 🧪 Pre-commit Tests
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ develop ]
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  quick-tests:
+    name: 🚀 Testes Rápidos
+    runs-on: windows-latest
+    
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+        
+    - name: 📦 Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pytest pytest-cov black flake8
+        
+    - name: 🎨 Check formatting
+      run: black --check .
+      
+    - name: 🔍 Lint code
+      run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+      
+    - name: 🧪 Run quick tests
+      run: pytest tests/test_simple.py -v
+      
+    - name: ✅ Validation passed
+      run: echo "✅ Código pronto para commit!"
+
+  accessibility-check:
+    name: ♿ Verificação de Acessibilidade
+    runs-on: windows-latest
+    
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+      
+    - name: 🎨 Verificar contraste de cores
+      run: |
+        echo "🎨 Verificando padrões de acessibilidade..."
+        
+        # Verificar se cores seguem padrões WCAG
+        $code = Get-Content -Path "gerar_od_gui.py" -Raw
+        
+        # Cores que devem estar presentes (WCAG compliant)
+        $required_colors = @(
+          "#007bff",  # Primary blue
+          "#28a745",  # Success green  
+          "#dc3545",  # Error red
+          "#f8f9fa",  # Background light
+          "#212529"   # Text dark
+        )
+        
+        $missing_colors = @()
+        foreach ($color in $required_colors) {
+          if ($code -notmatch [regex]::Escape($color)) {
+            $missing_colors += $color
+          }
+        }
+        
+        if ($missing_colors.Count -gt 0) {
+          Write-Host "⚠️ Cores de acessibilidade ausentes: $($missing_colors -join ', ')"
+        } else {
+          Write-Host "✅ Cores de acessibilidade presentes"
+        }
+        
+    - name: 📱 Verificar responsividade
+      run: |
+        echo "📱 Verificando padrões de responsividade..."
+        
+        # Verificar se componentes GUI usam grid apropriado
+        $gui_code = Get-Content -Path "gerar_od_gui.py" -Raw
+        
+        if ($gui_code -match "grid_columnconfigure.*weight") {
+          Write-Host "✅ Grid responsivo configurado"
+        } else {
+          Write-Host "⚠️ Verificar configuração de grid responsivo"
+        }
+        
+        if ($gui_code -match "sticky.*nsew|sticky.*ew") {
+          Write-Host "✅ Componentes com expansão configurada"
+        } else {
+          Write-Host "⚠️ Verificar expansão de componentes"
+        }

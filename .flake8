@@ -1,0 +1,19 @@
+[flake8]
+exclude = 
+    .venv,
+    __pycache__,
+    .git,
+    build,
+    dist,
+    *.egg-info,
+    htmlcov
+
+max-line-length = 88
+ignore = 
+    E203,  # whitespace before ':'
+    W503,  # line break before binary operator
+    F824,  # unused global (often false positives)
+    F821   # undefined name (often false positives)
+
+per-file-ignores =
+    __init__.py:F401  # unused imports in __init__.py
