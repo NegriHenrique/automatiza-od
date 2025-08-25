@@ -26,10 +26,24 @@ print_status() {
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 print_status "Branch atual: $BRANCH" "info"
 
-# Verificar se há mudanças não commitadas
-if ! git diff-index --quiet HEAD --; then
+# Verificar se há mudanças não commitadas (com verificação mais robusta)
+if [ -n "$(git status --porcelain)" ]; then
     print_status "Há mudanças não commitadas. Commit primeiro." "error"
+    git status --short
     exit 1
+fi
+
+# Verificação adicional para ter certeza
+if ! git diff-index --quiet HEAD --; then
+    print_status "Detectadas diferenças no índice. Verificando..." "warning"
+    # Tentar sincronizar o índice
+    git update-index --refresh > /dev/null 2>&1 || true
+    # Verificar novamente
+    if ! git diff-index --quiet HEAD --; then
+        print_status "Ainda há mudanças detectadas. Commit primeiro." "error"
+        git diff-index HEAD --
+        exit 1
+    fi
 fi
 
 # Ativar ambiente virtual se necessário
