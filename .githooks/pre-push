@@ -47,7 +47,7 @@ WARNINGS=0
 
 # 1. Suite completa de testes
 print_status "Executando suite completa de testes..." "info"
-if ! .venv/Scripts/python.exe -m pytest test_simple.py --tb=short; then
+if ! .venv/Scripts/python.exe -m pytest tests/ --tb=short; then
     print_status "Testes falharam" "error"
     ERRORS=$((ERRORS + 1))
 else
