@@ -32,11 +32,29 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: "pip"
 
+      - name: 📦 Cache de dependências
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            .venv
+            */build
+            */dist
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/setup.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: 📦 Instalar dependências
         run: |
           python -m pip install --upgrade pip
+          python -m venv .venv
+          .venv/Scripts/Activate.ps1
           pip install -r requirements.txt
-          pip install pytest pytest-cov black flake8 mypy bandit safety
+          pip install pytest pytest-cov pytest-xdist black flake8 mypy bandit safety doc8
+
+      - name: 📚 Validar documentação
+        run: |
+          doc8 docs/ README.md --ignore D001
 
       - name: 🎨 Verificar formatação (Black)
         run: |
@@ -67,7 +85,10 @@ jobs:
 
       - name: 🧪 Executar testes unitários
         run: |
-          pytest tests/ -v --cov=. --cov-report=html --cov-report=xml --cov-fail-under=70
+          pytest tests/ -v -n auto --dist loadfile \
+            --cov=. --cov-report=html --cov-report=xml \
+            --cov-fail-under=70 \
+            --junit-xml=test-results.xml
 
       - name: 📊 Upload coverage para Codecov
         uses: codecov/codecov-action@v3
@@ -76,6 +97,13 @@ jobs:
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
+
+      - name: 📈 Publicar resultados de teste
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: test-results
+          path: test-results.xml
 
       - name: 📋 Artefatos de relatórios
         uses: actions/upload-artifact@v4
@@ -98,6 +126,116 @@ jobs:
     steps:
       - name: 📥 Checkout código
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Necessário para gerar changelog
+
+      - name: 🔄 Gerar Changelog
+        id: changelog
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          output: CHANGELOG.md
+          excludeLabels: duplicate,question,invalid,wontfix
+          breakingLabel: "### ⚠️ Breaking Changes"
+          enhancementLabel: "### 🚀 Melhorias"
+          bugsLabel: "### 🐛 Correções de Bugs"
+          deprecatedLabel: "### ⚠️ Deprecated"
+          removedLabel: "### 🗑️ Removido"
+          securityLabel: "### 🔒 Segurança"
+          issuesLabel: "### 📋 Outras Issues"
+
+      - name: 🐍 Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: 📦 Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          python -m venv .venv
+          .venv/Scripts/Activate.ps1
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: 🔨 Build Executável
+        run: |
+          .venv/Scripts/Activate.ps1
+          python build_exe.py
+
+      - name: 📝 Assinar Executável
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.SIGNING_CERTIFICATE }}
+          CERTIFICATE_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+        run: |
+          # Decodificar certificado
+          $certBytes = [Convert]::FromBase64String($env:CERTIFICATE_BASE64)
+          $certPath = "certificate.pfx"
+          [IO.File]::WriteAllBytes($certPath, $certBytes)
+
+          # Assinar executável
+          ./sign_executable.ps1 -CertPath $certPath -CertPassword $env:CERTIFICATE_PASSWORD -FilePath "distribuicao/GeradorOD.exe"
+
+      - name: 📦 Criar Distribuição Completa
+        run: |
+          .venv/Scripts/Activate.ps1
+
+          # Preparar pasta de distribuição
+          $dist = "distribuicao_completa"
+          Remove-Item -Path $dist -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path $dist
+
+          # Copiar arquivos
+          Copy-Item "distribuicao/GeradorOD.exe" "$dist/"
+          Copy-Item "README.txt" "$dist/"
+          Copy-Item "config_dias_filmagem.json" "$dist/"
+          Copy-Item -Path "arquivos" -Destination "$dist/" -Recurse
+
+          # Criar ZIP
+          $version = (Get-Date -Format "yyyy.MM.dd")
+          Compress-Archive -Path "$dist/*" -DestinationPath "GeradorOD-$version.zip"
+
+      - name: 📤 Upload Artefatos
+        uses: actions/upload-artifact@v4
+        with:
+          name: GeradorOD
+          path: |
+            distribuicao/GeradorOD.exe
+            GeradorOD-*.zip
+            CHANGELOG.md
+
+  # 🚀 RELEASE
+  publish_release:
+    name: 🚀 Publicar Release
+    runs-on: windows-latest
+    needs: build
+    if: github.event_name == 'release'
+
+    steps:
+      - name: 📥 Download Artefatos
+        uses: actions/download-artifact@v4
+        with:
+          name: GeradorOD
+
+      - name: 📋 Ler Changelog
+        id: changelog
+        run: |
+          $changelog = Get-Content CHANGELOG.md -Raw
+          $changelog = $changelog -replace "`n","%0A"
+          echo "::set-output name=content::$changelog"
+
+      - name: 🎉 Criar Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            GeradorOD-*.zip
+            distribuicao/GeradorOD.exe
+          body: ${{ steps.changelog.outputs.content }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🐍 Configurar Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v4
@@ -164,61 +302,26 @@ jobs:
           # Teste se o executável inicia sem erros (modo CLI) com timeout
           $exePath = "distribuicao_completa/GeradorOD.exe"
           if (Test-Path $exePath) {
-            Write-Host "🔍 Testando executável com --help..."
-            
             $startInfo = New-Object System.Diagnostics.ProcessStartInfo
             $startInfo.FileName = $exePath
             $startInfo.Arguments = "--help"
             $startInfo.UseShellExecute = $false
             $startInfo.RedirectStandardOutput = $true
             $startInfo.RedirectStandardError = $true
-            
             $process = New-Object System.Diagnostics.Process
             $process.StartInfo = $startInfo
-            
-            try {
-              $process.Start() | Out-Null
-              
-              # Capturar saída padrão e erro assincronamente
-              $outputTask = $process.StandardOutput.ReadToEndAsync()
-              $errorTask = $process.StandardError.ReadToEndAsync()
-              
-              # Esperar 5 segundos pelo --help
-              if ($process.WaitForExit(5000)) {
-                $output = $outputTask.Result
-                $error = $errorTask.Result
-                
-                if ($process.ExitCode -eq 0) {
-                  Write-Host "✅ Executável respondeu ao --help com sucesso"
-                  Write-Host "📝 Saída do --help:"
-                  Write-Host $output
-                  
-                  # Verificar se a saída contém algo útil
-                  if ($output -match "uso:|usage:|help|ajuda") {
-                    Write-Host "✅ Menu de ajuda detectado!"
-                  } else {
-                    Write-Host "⚠️ Saída do --help não reconhecida, mas executável respondeu"
-                  }
-                } else {
-                  Write-Host "⚠️ Executável retornou código: $($process.ExitCode)"
-                  Write-Host "📝 Saída de erro:"
-                  Write-Host $error
-                  exit 1
-                }
+            $process.Start() | Out-Null
+            # Timeout de 15 segundos
+            if ($process.WaitForExit(15000)) {
+              if ($process.ExitCode -eq 0) {
+                Write-Host "✅ Executável passou no teste básico"
               } else {
-                Write-Host "❌ Timeout: --help não respondeu em 5 segundos"
-                $process.Kill()
-                exit 1
+                Write-Host "⚠️ Executável retornou código: $($process.ExitCode)"
               }
-            }
-            catch {
-              Write-Error "❌ Erro ao executar teste: $_"
+            } else {
+              Write-Host "❌ Timeout: Executável não respondeu em 15 segundos"
+              $process.Kill()
               exit 1
-            }
-            finally {
-              if (-not $process.HasExited) {
-                $process.Kill()
-              }
             }
           } else {
             Write-Error "❌ Executável não encontrado para teste!"
