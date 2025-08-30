@@ -1,0 +1,57 @@
+repos:
+- repo: local
+  hooks:
+    - id: black
+      name: black
+      entry: black
+      language: system
+      types: [python]
+      require_serial: true
+
+    - id: flake8
+      name: flake8
+      entry: flake8
+      language: system
+      types: [python]
+      args: [--max-line-length=88, --extend-ignore=E203]
+
+    - id: bandit
+      name: bandit
+      entry: bandit
+      language: system
+      types: [python]
+      args: ["-r", ".", "--skip=B101,B601,B603,B607"]
+      exclude: ^(tests/|.venv/|build_temp/|htmlcov/|distribuicao/)
+
+    - id: safety
+      name: safety
+      entry: safety check
+      language: system
+      types: [python]
+      pass_filenames: false
+
+    - id: mypy
+      name: mypy
+      entry: mypy
+      language: system
+      types: [python]
+      args: ["--ignore-missing-imports", "--strict-optional"]
+      require_serial: true
+
+    - id: check-yaml
+      name: check yaml
+      entry: python -c 'import sys, yaml; yaml.safe_load(open(sys.argv[1]))'
+      language: system
+      types: [yaml]
+
+    - id: check-json
+      name: check json
+      entry: python -c 'import sys, json; json.load(open(sys.argv[1]))'
+      language: system
+      types: [json]
+
+    - id: check-docstring
+      name: check docstring
+      entry: python -c 'import sys, ast; ast.parse(open(sys.argv[1]).read())'
+      language: system
+      types: [python]
