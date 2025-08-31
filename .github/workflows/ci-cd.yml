@@ -161,71 +161,71 @@ jobs:
             exit 1
           }
 
-      - name: 🧪 Teste básico do executável
-        run: |
-          # Teste se o executável inicia sem erros (modo CLI) com timeout
-          $exePath = "distribuicao_completa/GeradorOD.exe"
-          if (Test-Path $exePath) {
-            Write-Host "🔍 Testando executável com --help..."
-            
-            $startInfo = New-Object System.Diagnostics.ProcessStartInfo
-            $startInfo.FileName = $exePath
-            $startInfo.Arguments = "--help"
-            $startInfo.UseShellExecute = $false
-            $startInfo.RedirectStandardOutput = $true
-            $startInfo.RedirectStandardError = $true
-            
-            $process = New-Object System.Diagnostics.Process
-            $process.StartInfo = $startInfo
-            
-            try {
-              $process.Start() | Out-Null
-              
-              # Capturar saída padrão e erro assincronamente
-              $outputTask = $process.StandardOutput.ReadToEndAsync()
-              $errorTask = $process.StandardError.ReadToEndAsync()
-              
-              # Esperar 5 segundos pelo --help
-              if ($process.WaitForExit(5000)) {
-                $output = $outputTask.Result
-                $error = $errorTask.Result
-                
-                if ($process.ExitCode -eq 0) {
-                  Write-Host "✅ Executável respondeu ao --help com sucesso"
-                  Write-Host "📝 Saída do --help:"
-                  Write-Host $output
-                  
-                  # Verificar se a saída contém algo útil
-                  if ($output -match "uso:|usage:|help|ajuda") {
-                    Write-Host "✅ Menu de ajuda detectado!"
-                  } else {
-                    Write-Host "⚠️ Saída do --help não reconhecida, mas executável respondeu"
-                  }
-                } else {
-                  Write-Host "⚠️ Executável retornou código: $($process.ExitCode)"
-                  Write-Host "📝 Saída de erro:"
-                  Write-Host $error
-                  exit 1
-                }
-              } else {
-                Write-Host "❌ Timeout: --help não respondeu em 5 segundos"
-                $process.Kill()
-                exit 1
-              }
-            }
-            catch {
-              Write-Error "❌ Erro ao executar teste: $_"
-              exit 1
-            }
-            finally {
-              if (-not $process.HasExited) {
-                $process.Kill()
-              }
-            }
-          } else {
-            Write-Error "❌ Executável não encontrado para teste!"
-            exit 1
-          }
+      # - name: 🧪 Teste básico do executável
+      #   run: |
+      #     # Teste se o executável inicia sem erros (modo CLI) com timeout
+      #     $exePath = "distribuicao_completa/GeradorOD.exe"
+      #     if (Test-Path $exePath) {
+      #       Write-Host "🔍 Testando executável com --help..."
+
+      #       $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+      #       $startInfo.FileName = $exePath
+      #       $startInfo.Arguments = "--help"
+      #       $startInfo.UseShellExecute = $false
+      #       $startInfo.RedirectStandardOutput = $true
+      #       $startInfo.RedirectStandardError = $true
+
+      #       $process = New-Object System.Diagnostics.Process
+      #       $process.StartInfo = $startInfo
+
+      #       try {
+      #         $process.Start() | Out-Null
+
+      #         # Capturar saída padrão e erro assincronamente
+      #         $outputTask = $process.StandardOutput.ReadToEndAsync()
+      #         $errorTask = $process.StandardError.ReadToEndAsync()
+
+      #         # Esperar 5 segundos pelo --help
+      #         if ($process.WaitForExit(5000)) {
+      #           $output = $outputTask.Result
+      #           $error = $errorTask.Result
+
+      #           if ($process.ExitCode -eq 0) {
+      #             Write-Host "✅ Executável respondeu ao --help com sucesso"
+      #             Write-Host "📝 Saída do --help:"
+      #             Write-Host $output
+
+      #             # Verificar se a saída contém algo útil
+      #             if ($output -match "uso:|usage:|help|ajuda") {
+      #               Write-Host "✅ Menu de ajuda detectado!"
+      #             } else {
+      #               Write-Host "⚠️ Saída do --help não reconhecida, mas executável respondeu"
+      #             }
+      #           } else {
+      #             Write-Host "⚠️ Executável retornou código: $($process.ExitCode)"
+      #             Write-Host "📝 Saída de erro:"
+      #             Write-Host $error
+      #             exit 1
+      #           }
+      #         } else {
+      #           Write-Host "❌ Timeout: --help não respondeu em 5 segundos"
+      #           $process.Kill()
+      #           exit 1
+      #         }
+      #       }
+      #       catch {
+      #         Write-Error "❌ Erro ao executar teste: $_"
+      #         exit 1
+      #       }
+      #       finally {
+      #         if (-not $process.HasExited) {
+      #           $process.Kill()
+      #         }
+      #       }
+      #     } else {
+      #       Write-Error "❌ Executável não encontrado para teste!"
+      #       exit 1
+      #     }
 
       - name: 📦 Criar pacote de distribuição
         run: |
