@@ -55,7 +55,7 @@ jobs:
 
           # Executar verificação focada em problemas críticos
           echo "🎯 Verificando apenas problemas críticos (Medium/High)..."
-          bandit -r . --exclude=.venv,tests,build_temp,htmlcov,distribuicao,distribuicao_completa --skip=B101,B601,B603,B607 --severity-level medium --confidence-level medium
+          bandit -r . --exclude="*/.venv/*,*/tests/*,*/build_temp/*,*/htmlcov/*,*/distribuicao/*,*/distribuicao_completa/*" --skip=B101,B601,B603,B607 --severity-level medium --confidence-level medium
 
           # Processar e mostrar resultados usando script Python
           python security_check.py || echo "⚠️ Script de verificação não disponível - usando validação básica"
