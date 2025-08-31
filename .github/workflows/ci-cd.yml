@@ -49,25 +49,104 @@ jobs:
 
       - name: 🔒 Verificação de segurança (Bandit)
         run: |
-          # Executar análise com parâmetros de linha de comando (mais confiável)
-          echo "🔍 Executando análise de segurança com Bandit..."
-          bandit -r . --exclude=.venv,tests,build_temp,htmlcov,distribuicao,distribuicao_completa --skip=B101,B601,B603,B607 -f json -o bandit-report.json || true
+          Write-Host "🔍 Iniciando análise de segurança..."
 
-          # Executar verificação focada em problemas críticos
-          echo "🎯 Verificando apenas problemas críticos (Medium/High)..."
-          bandit -r . --exclude=.venv,tests,build_temp,htmlcov,distribuicao,distribuicao_completa --skip=B101,B601,B603,B607 --severity-level medium --confidence-level medium
-
-          # Processar e mostrar resultados usando script Python
-          python security_check.py || echo "⚠️ Script de verificação não disponível - usando validação básica"
+          # Análise completa com JSON para processamento
+          Write-Host "� Executando análise completa..."
+          bandit -r . `
+            --exclude=.venv,tests,build_temp,htmlcov,distribuicao,distribuicao_completa `
+            --skip=B101,B601,B603,B607 `
+            -f json -o bandit-report.json
+            
+          # Análise focada em problemas críticos
+          Write-Host "🎯 Verificando problemas críticos..."
+          bandit -r . `
+            --exclude=.venv,tests,build_temp,htmlcov,distribuicao,distribuicao_completa `
+            --skip=B101,B601,B603,B607 `
+            --severity-level medium `
+            --confidence-level medium `
+            --format custom `
+            --msg-template "{severity}: {test_id} - {msg}"
+            
+          # Análise dos resultados
+          Write-Host "📈 Analisando resultados..."
+          if (Test-Path bandit-report.json) {
+            $report = Get-Content bandit-report.json | ConvertFrom-Json
+            $highSeverity = ($report.results | Where-Object { $_.issue_severity -eq "HIGH" }).Count
+            $mediumSeverity = ($report.results | Where-Object { $_.issue_severity -eq "MEDIUM" }).Count
+            
+            Write-Host "- Problemas críticos (HIGH): $highSeverity"
+            Write-Host "- Problemas médios (MEDIUM): $mediumSeverity"
+            
+            if ($highSeverity -gt 0) {
+              Write-Error "❌ Problemas críticos de segurança encontrados"
+              exit 1
+            }
+          }
 
       - name: 🛡️ Verificar vulnerabilidades (Safety)
         run: |
-          safety check --json --output safety-report.json || true
-          safety check
+          Write-Host "🔍 Verificando vulnerabilidades em dependências..."
+
+          # Verificação detalhada com relatório JSON
+          safety check --json --output safety-report.json
+
+          # Análise de resultados
+          if (Test-Path safety-report.json) {
+            $report = Get-Content safety-report.json | ConvertFrom-Json
+            $vulnerabilities = $report.vulnerabilities.Count
+            
+            if ($vulnerabilities -gt 0) {
+              Write-Host "⚠️ $vulnerabilities vulnerabilidades encontradas:"
+              foreach ($vuln in $report.vulnerabilities) {
+                Write-Host "- $($vuln.package): $($vuln.vulnerability_id)"
+                Write-Host "  $($vuln.advisory)"
+              }
+              Write-Error "❌ Vulnerabilidades críticas encontradas"
+              exit 1
+            } else {
+              Write-Host "✅ Nenhuma vulnerabilidade encontrada"
+            }
+          }
+
+          # Verificação secundária com saída formatada
+          safety check --full-report --output text
 
       - name: 🧪 Executar testes unitários
         run: |
-          pytest tests/ -v --cov=. --cov-report=html --cov-report=xml --cov-fail-under=70
+          Write-Host "🔬 Iniciando suite de testes..."
+
+          # Executar testes com paralelismo e relatórios detalhados
+          pytest tests/ -v -n auto --dist loadfile `
+            --cov=. --cov-report=html --cov-report=xml `
+            --cov-fail-under=80 `
+            --junit-xml=test-results.xml `
+            --durations=10 `
+            --maxfail=5
+
+          # Analisar resultados dos testes
+          if (Test-Path test-results.xml) {
+            Write-Host "📊 Analisando resultados dos testes..."
+            [xml]$testResults = Get-Content test-results.xml
+            $total = $testResults.testsuites.tests
+            $failures = $testResults.testsuites.failures
+            $errors = $testResults.testsuites.errors
+            $skipped = $testResults.testsuites.skipped
+            
+            Write-Host "📈 Resumo dos Testes:"
+            Write-Host "- Total: $total"
+            Write-Host "- Falhas: $failures"
+            Write-Host "- Erros: $errors"
+            Write-Host "- Ignorados: $skipped"
+            
+            if ($failures -gt 0 -or $errors -gt 0) {
+              Write-Error "❌ Falhas encontradas nos testes"
+              exit 1
+            }
+          } else {
+            Write-Error "❌ Arquivo de resultados não encontrado"
+            exit 1
+          }
 
       - name: 📊 Upload coverage para Codecov
         uses: codecov/codecov-action@v3
@@ -75,7 +154,29 @@ jobs:
           file: ./coverage.xml
           flags: unittests
           name: codecov-umbrella
-          fail_ci_if_error: false
+          fail_ci_if_error: true
+
+      - name: 📈 Gerar relatório de cobertura
+        if: always()
+        run: |
+          Write-Host "📊 Gerando relatório detalhado de cobertura..."
+
+          # Analisar XML de cobertura
+          [xml]$coverage = Get-Content coverage.xml
+          $totalLines = $coverage.coverage.'lines-valid'
+          $coveredLines = $coverage.coverage.'lines-covered'
+          $percentage = [math]::Round(($coveredLines / $totalLines) * 100, 2)
+
+          Write-Host "📈 Cobertura de Código:"
+          Write-Host "- Linhas Totais: $totalLines"
+          Write-Host "- Linhas Cobertas: $coveredLines"
+          Write-Host "- Porcentagem: $percentage%"
+
+          # Verificar se atinge o mínimo
+          if ($percentage -lt 80) {
+            Write-Error "❌ Cobertura abaixo do mínimo de 80%"
+            exit 1
+          }
 
       - name: 📋 Artefatos de relatórios
         uses: actions/upload-artifact@v4
