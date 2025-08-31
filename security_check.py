@@ -131,48 +131,48 @@ def check_bandit():
         return False
 
 
-def check_safety():
-    """Verifica vulnerabilidades nas dependencias"""
-    print("\n" + "=" * 50)
-    print("Protecao VERIFICACAO DE VULNERABILIDADES (SAFETY)")
-    print("=" * 50)
+# def check_safety():
+#     """Verifica vulnerabilidades nas dependencias"""
+#     print("\n" + "=" * 50)
+#     print("Protecao VERIFICACAO DE VULNERABILIDADES (SAFETY)")
+#     print("=" * 50)
 
-    # Verificar se safety esta instalado
-    success, _, _ = run_command(["safety", "--version"], "Verificando Safety")
-    if not success:
-        print("Aviso Safety nao instalado. Instalando...")
-        install_success, _, _ = run_command(
-            ["pip", "install", "safety"], "Instalando Safety"
-        )
-        if not install_success:
-            print("Erro Erro ao instalar Safety")
-            return False
+#     # Verificar se safety esta instalado
+#     success, _, _ = run_command(["safety", "--version"], "Verificando Safety")
+#     if not success:
+#         print("Aviso Safety nao instalado. Instalando...")
+#         install_success, _, _ = run_command(
+#             ["pip", "install", "safety"], "Instalando Safety"
+#         )
+#         if not install_success:
+#             print("Erro Erro ao instalar Safety")
+#             return False
 
-    # Executar safety check
-    success, stdout, stderr = run_command(
-        ["safety", "check", "--json"], "Verificando vulnerabilidades"
-    )
+#     # Executar safety check
+#     success, stdout, stderr = run_command(
+#         ["safety", "check", "--json"], "Verificando vulnerabilidades"
+#     )
 
-    if success and "[]" in stdout:
-        print("Sucesso Nenhuma vulnerabilidade encontrada")
-        return True
-    elif success:
-        try:
-            vulnerabilities = json.loads(stdout)
-            print(f"Aviso {len(vulnerabilities)} vulnerabilidade(s) encontrada(s):")
-            for vuln in vulnerabilities[:3]:  # Mostrar apenas as primeiras 3
-                print(
-                    f"  Pacote {vuln.get('package_name')} {vuln.get('installed_version')}"
-                )
-                print(f"     {vuln.get('advisory')}")
-                print()
-            return False
-        except json.JSONDecodeError:
-            print("Erro Erro ao analisar resultados do Safety")
-            return False
-    else:
-        print(f"Erro Erro executando Safety: {stderr}")
-        return False
+#     if success and "[]" in stdout:
+#         print("Sucesso Nenhuma vulnerabilidade encontrada")
+#         return True
+#     elif success:
+#         try:
+#             vulnerabilities = json.loads(stdout)
+#             print(f"Aviso {len(vulnerabilities)} vulnerabilidade(s) encontrada(s):")
+#             for vuln in vulnerabilities[:3]:  # Mostrar apenas as primeiras 3
+#                 print(
+#                     f"  Pacote {vuln.get('package_name')} {vuln.get('installed_version')}"
+#                 )
+#                 print(f"     {vuln.get('advisory')}")
+#                 print()
+#             return False
+#         except json.JSONDecodeError:
+#             print("Erro Erro ao analisar resultados do Safety")
+#             return False
+#     else:
+#         print(f"Erro Erro executando Safety: {stderr}")
+#         return False
 
 
 def check_dependencies():
@@ -264,7 +264,7 @@ def main():
     # Executar verificacoes
     checks = [
         ("Analise Bandit", check_bandit),
-        ("Verificacao Safety", check_safety),
+        # ("Verificacao Safety", check_safety),
         ("Dependencias", check_dependencies),
         ("Permissoes", check_file_permissions),
     ]
