@@ -214,38 +214,83 @@ jobs:
 
       - name: 🔨 Gerar executável
         run: |
-          python build_exe.py
+          Write-Host "🚀 Iniciando build do executável..."
+          
+          # Configurar ambiente de build
+          Write-Host "⚙️ Configurando ambiente..."
+          $env:PYTHONOPTIMIZE = "2"
+          $env:PYTHONHASHSEED = "42"  # Para builds determinísticos
+          
+          # Executar build com log detalhado
+          Write-Host "🔨 Executando build..."
+          python build_exe.py --log-level DEBUG
+          
+          # Verificar resultado
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "❌ Falha no build"
+            exit 1
+          }
 
       - name: 🛡️ Análise de segurança do executável
         run: |
-          # Verificar se o executável foi criado
-          if (Test-Path "distribuicao_completa/GeradorOD.exe") {
+          $exePath = "distribuicao_completa/GeradorOD.exe"
+          
+          if (Test-Path $exePath) {
             Write-Host "✅ Executável encontrado"
             
-            # Verificar integridade do arquivo
-            $hash = Get-FileHash "distribuicao_completa/GeradorOD.exe" -Algorithm SHA256
-            Write-Host "🔐 Hash SHA256: $($hash.Hash)"
+            # Análise básica
+            $fileInfo = Get-Item $exePath
+            $size = $fileInfo.Length / 1MB
+            $created = $fileInfo.CreationTime
+            $modified = $fileInfo.LastWriteTime
             
-            # Criar arquivo de hash para verificação
-            $hash.Hash | Out-File "distribuicao_completa/GeradorOD.exe.sha256"
+            Write-Host "📊 Informações Básicas:"
+            Write-Host "- Tamanho: $([math]::Round($size, 2)) MB"
+            Write-Host "- Criado em: $created"
+            Write-Host "- Modificado em: $modified"
             
-            # Verificar tamanho (executáveis muito pequenos ou grandes podem ser suspeitos)
-            $size = (Get-Item "distribuicao_completa/GeradorOD.exe").Length / 1MB
-            Write-Host "📊 Tamanho: $([math]::Round($size, 2)) MB"
+            # Verificações de segurança
+            Write-Host "🔐 Verificações de Segurança:"
             
-            if ($size -lt 10 -or $size -gt 200) {
-              Write-Host "⚠️ Tamanho incomum detectado - revisar se necessário"
+            # 1. Hash SHA256
+            $hash = Get-FileHash $exePath -Algorithm SHA256
+            Write-Host "- Hash SHA256: $($hash.Hash)"
+            $hash.Hash | Out-File "$exePath.sha256"
+            
+            # 2. Verificar assinatura digital
+            try {
+              $sig = Get-AuthenticodeSignature $exePath
+              Write-Host "- Assinatura: $($sig.Status)"
+            } catch {
+              Write-Host "- Assinatura: Não disponível"
             }
             
-            # Verificar se não é um arquivo de texto (indicaria falha no build)
-            $fileType = file "distribuicao_completa/GeradorOD.exe" 2>$null
-            if ($fileType -match "text") {
-              Write-Error "❌ Executável parece ser arquivo de texto - build falhou"
+            # 3. Análise de tamanho
+            if ($size -lt 10) {
+              Write-Error "❌ Executável muito pequeno (< 10MB)"
+              exit 1
+            }
+            if ($size -gt 200) {
+              Write-Error "❌ Executável muito grande (> 200MB)"
               exit 1
             }
             
+            # 4. Verificar tipo de arquivo
+            $mime = file $exePath --mime-type
+            if ($mime -notmatch "application/x-dosexec") {
+              Write-Error "❌ Arquivo não é um executável válido"
+              exit 1
+            }
+            
+            # 5. Verificar metadados PE
+            $peInfo = Get-Item $exePath
+            if (-not ($peInfo.VersionInfo.FileDescription)) {
+              Write-Warning "⚠️ Executável sem metadados"
+            }
+            
+            Write-Host "✅ Todas as verificações de segurança passaram"
           } else {
-            Write-Error "❌ Executável não foi criado!"
+            Write-Error "❌ Executável não encontrado!"
             exit 1
           }
 
