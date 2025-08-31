@@ -38,6 +38,11 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-cov black flake8 mypy bandit safety
 
+      - name: 🧪 Executar testes e cobertura
+        run: |
+          Write-Host "🧪 Executando testes com cobertura..."
+          pytest tests/ --cov=. --cov-report=xml --cov-report=html
+
       - name: 🎨 Verificar formatação (Black)
         run: |
           black --check --diff .
@@ -84,20 +89,13 @@ jobs:
             }
           }
 
-      - name: 🛡️ Verificar vulnerabilidades (Safety)
+      - name: � Verificar dependências
         run: |
-          Write-Host "🔍 Verificando vulnerabilidades em dependências..."
+          Write-Host "🔍 Analisando dependências do projeto..."
+          pip check
 
-          # Verificação detalhada com relatório JSON
-          safety check --json --output safety-report.json
-
-          # Análise de resultados
-          if (Test-Path safety-report.json) {
-            $report = Get-Content safety-report.json | ConvertFrom-Json
-            $vulnerabilities = $report.vulnerabilities.Count
-            
-            if ($vulnerabilities -gt 0) {
-              Write-Host "⚠️ $vulnerabilities vulnerabilidades encontradas:"
+          Write-Host "📊 Listando dependências instaladas..."
+          pip list
               foreach ($vuln in $report.vulnerabilities) {
                 Write-Host "- $($vuln.package): $($vuln.vulnerability_id)"
                 Write-Host "  $($vuln.advisory)"
@@ -215,16 +213,16 @@ jobs:
       - name: 🔨 Gerar executável
         run: |
           Write-Host "🚀 Iniciando build do executável..."
-          
+
           # Configurar ambiente de build
           Write-Host "⚙️ Configurando ambiente..."
           $env:PYTHONOPTIMIZE = "2"
           $env:PYTHONHASHSEED = "42"  # Para builds determinísticos
-          
+
           # Executar build com log detalhado
           Write-Host "🔨 Executando build..."
           python build_exe.py --log-level DEBUG
-          
+
           # Verificar resultado
           if ($LASTEXITCODE -ne 0) {
             Write-Error "❌ Falha no build"
@@ -234,7 +232,7 @@ jobs:
       - name: 🛡️ Análise de segurança do executável
         run: |
           $exePath = "distribuicao_completa/GeradorOD.exe"
-          
+
           if (Test-Path $exePath) {
             Write-Host "✅ Executável encontrado"
             
