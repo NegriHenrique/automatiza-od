@@ -268,132 +268,132 @@ jobs:
           retention-days: 30
 
   # 🚀 RELEASE AUTOMÁTICO
-  release:
-    name: 🚀 Create Release
-    runs-on: windows-latest
-    needs: [tests, build]
-    if: github.event_name == 'release' && github.event.action == 'published'
+  # release:
+  #   name: 🚀 Create Release
+  #   runs-on: windows-latest
+  #   needs: [tests, build]
+  #   if: github.event_name == 'release' && github.event.action == 'published'
 
-    steps:
-      - name: 📥 Download artefatos
-        uses: actions/download-artifact@v4
-        with:
-          name: executavel-windows
+  #   steps:
+  #     - name: 📥 Download artefatos
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: executavel-windows
 
-      - name: 🚀 Upload para Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            OrdemDoDia-*.zip
-            OrdemDoDia-*.zip.sha256
-            OrdemDoDia-*.manifest.json
-          body: |
-            ## 🎉 Nova versão do Ordem do Dia!
+  #     - name: 🚀 Upload para Release
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         files: |
+  #           OrdemDoDia-*.zip
+  #           OrdemDoDia-*.zip.sha256
+  #           OrdemDoDia-*.manifest.json
+  #         body: |
+  #           ## 🎉 Nova versão do Ordem do Dia!
 
-            ### 📦 Arquivos de Download
-            - **OrdemDoDia-*.zip**: Aplicação completa com executável
-            - **OrdemDoDia-*.zip.sha256**: Hash SHA256 para verificação
-            - **OrdemDoDia-*.manifest.json**: Manifesto de segurança e integridade
+  #           ### 📦 Arquivos de Download
+  #           - **OrdemDoDia-*.zip**: Aplicação completa com executável
+  #           - **OrdemDoDia-*.zip.sha256**: Hash SHA256 para verificação
+  #           - **OrdemDoDia-*.manifest.json**: Manifesto de segurança e integridade
 
-            ### 🚀 Como Usar
-            1. Baixe o arquivo ZIP
-            2. Extraia em uma pasta de sua escolha
-            3. Execute `GeradorOD.exe`
-            4. Siga as instruções na interface
+  #           ### 🚀 Como Usar
+  #           1. Baixe o arquivo ZIP
+  #           2. Extraia em uma pasta de sua escolha
+  #           3. Execute `GeradorOD.exe`
+  #           4. Siga as instruções na interface
 
-            ### 📋 Requisitos
-            - Windows 10/11 (64-bit)
-            - 4GB RAM mínimo
-            - 100MB espaço livre
+  #           ### 📋 Requisitos
+  #           - Windows 10/11 (64-bit)
+  #           - 4GB RAM mínimo
+  #           - 100MB espaço livre
 
-            ### 🆘 Suporte
-            - 📖 Manual: Incluído no ZIP
-            - 🐛 Issues: [GitHub Issues](https://github.com/${{ github.repository }}/issues)
-            - 📧 Email: [Contato do desenvolvedor]
+  #           ### 🆘 Suporte
+  #           - 📖 Manual: Incluído no ZIP
+  #           - 🐛 Issues: [GitHub Issues](https://github.com/${{ github.repository }}/issues)
+  #           - 📧 Email: [Contato do desenvolvedor]
 
-            ---
-            **Testado em**: Windows 10, Windows 11  
-            **Build**: ${{ github.sha }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #           ---
+  #           **Testado em**: Windows 10, Windows 11
+  #           **Build**: ${{ github.sha }}
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # 📋 NOTIFICAÇÕES E LINKS
-  notify:
-    name: 📋 Notificações
-    runs-on: ubuntu-latest
-    needs: [tests, build]
-    if: always()
+  # # 📋 NOTIFICAÇÕES E LINKS
+  # notify:
+  #   name: 📋 Notificações
+  #   runs-on: ubuntu-latest
+  #   needs: [tests, build]
+  #   if: always()
 
-    steps:
-      - name: 🔗 Comentário com link do artefato
-        if: needs.tests.result == 'success' && needs.build.result == 'success'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const runId = context.runId;
-            const repo = context.repo;
-            const sha = context.sha;
+  #   steps:
+  #     - name: 🔗 Comentário com link do artefato
+  #       if: needs.tests.result == 'success' && needs.build.result == 'success'
+  #       uses: actions/github-script@v7
+  #       with:
+  #         script: |
+  #           const runId = context.runId;
+  #           const repo = context.repo;
+  #           const sha = context.sha;
 
-            const artifactUrl = `https://github.com/${repo.owner}/${repo.repo}/actions/runs/${runId}`;
-            const downloadUrl = `${artifactUrl}#artifacts`;
+  #           const artifactUrl = `https://github.com/${repo.owner}/${repo.repo}/actions/runs/${runId}`;
+  #           const downloadUrl = `${artifactUrl}#artifacts`;
 
-            const comment = `## 🎉 Build Concluído com Sucesso!
+  #           const comment = `## 🎉 Build Concluído com Sucesso!
 
-            ### 📦 **Download Direto do Executável**
-            🔗 **[BAIXAR EXECUTÁVEL AQUI](${downloadUrl})**
+  #           ### 📦 **Download Direto do Executável**
+  #           🔗 **[BAIXAR EXECUTÁVEL AQUI](${downloadUrl})**
 
-            ### 📊 **Resultados do Build**
-            - ✅ **Testes**: ${context.payload.workflow_run?.conclusion || 'Passou'} 
-            - ✅ **Build**: Sucesso
-            - 🏗️ **Commit**: \`${sha.substring(0, 7)}\`
-            - 📅 **Data**: ${new Date().toLocaleString('pt-BR')}
+  #           ### 📊 **Resultados do Build**
+  #           - ✅ **Testes**: ${context.payload.workflow_run?.conclusion || 'Passou'}
+  #           - ✅ **Build**: Sucesso
+  #           - 🏗️ **Commit**: \`${sha.substring(0, 7)}\`
+  #           - 📅 **Data**: ${new Date().toLocaleString('pt-BR')}
 
-            ### 🚀 **Links Rápidos**
-            - 📋 [Ver Logs Completos](${artifactUrl})
-            - 📦 [Download Artefatos](${downloadUrl})
-            - 🔍 [Detalhes do Commit](https://github.com/${repo.owner}/${repo.repo}/commit/${sha})
+  #           ### 🚀 **Links Rápidos**
+  #           - 📋 [Ver Logs Completos](${artifactUrl})
+  #           - 📦 [Download Artefatos](${downloadUrl})
+  #           - 🔍 [Detalhes do Commit](https://github.com/${repo.owner}/${repo.repo}/commit/${sha})
 
-            ### 💡 **Como Baixar**
-            1. Clique no link **"BAIXAR EXECUTÁVEL AQUI"** acima
-            2. Role até a seção "Artifacts" 
-            3. Clique em **"executavel-windows"**
-            4. O download começará automaticamente
+  #           ### 💡 **Como Baixar**
+  #           1. Clique no link **"BAIXAR EXECUTÁVEL AQUI"** acima
+  #           2. Role até a seção "Artifacts"
+  #           3. Clique em **"executavel-windows"**
+  #           4. O download começará automaticamente
 
-            ---
-            🤖 *Comentário automático do CI/CD*`;
+  #           ---
+  #           🤖 *Comentário automático do CI/CD*`;
 
-            // Se for um push, comenta no commit
-            if (context.eventName === 'push') {
-              await github.rest.repos.createCommitComment({
-                owner: repo.owner,
-                repo: repo.repo,
-                commit_sha: sha,
-                body: comment
-              });
-            }
+  #           // Se for um push, comenta no commit
+  #           if (context.eventName === 'push') {
+  #             await github.rest.repos.createCommitComment({
+  #               owner: repo.owner,
+  #               repo: repo.repo,
+  #               commit_sha: sha,
+  #               body: comment
+  #             });
+  #           }
 
-            // Se for um PR, comenta no PR
-            if (context.payload.pull_request) {
-              await github.rest.issues.createComment({
-                owner: repo.owner,
-                repo: repo.repo,
-                issue_number: context.payload.pull_request.number,
-                body: comment
-              });
-            }
+  #           // Se for um PR, comenta no PR
+  #           if (context.payload.pull_request) {
+  #             await github.rest.issues.createComment({
+  #               owner: repo.owner,
+  #               repo: repo.repo,
+  #               issue_number: context.payload.pull_request.number,
+  #               body: comment
+  #             });
+  #           }
 
-      - name: 💬 Notificar sucesso
-        if: needs.tests.result == 'success' && needs.build.result == 'success'
-        run: |
-          echo "✅ Pipeline executado com sucesso!"
-          echo "🧪 Testes: PASSOU"
-          echo "🔨 Build: PASSOU"
-          echo "🔗 Link do artefato postado automaticamente!"
+  #     - name: 💬 Notificar sucesso
+  #       if: needs.tests.result == 'success' && needs.build.result == 'success'
+  #       run: |
+  #         echo "✅ Pipeline executado com sucesso!"
+  #         echo "🧪 Testes: PASSOU"
+  #         echo "🔨 Build: PASSOU"
+  #         echo "🔗 Link do artefato postado automaticamente!"
 
-      - name: 🚨 Notificar falha
-        if: needs.tests.result == 'failure' || needs.build.result == 'failure'
-        run: |
-          echo "❌ Pipeline falhou!"
-          echo "🧪 Testes: ${{ needs.tests.result }}"
-          echo "🔨 Build: ${{ needs.build.result }}"
-          exit 1
+  #     - name: 🚨 Notificar falha
+  #       if: needs.tests.result == 'failure' || needs.build.result == 'failure'
+  #       run: |
+  #         echo "❌ Pipeline falhou!"
+  #         echo "🧪 Testes: ${{ needs.tests.result }}"
+  #         echo "🔨 Build: ${{ needs.build.result }}"
+  #         exit 1
